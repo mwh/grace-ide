@@ -96,7 +96,12 @@ method deleteCompileFiles(page_num : Number) {
 
 
 
+var currentConsole := "output"      // Which console is being shown
+var out := false
 
+
+var outText := ""
+var errorText := ""
 
 
 
@@ -292,11 +297,6 @@ var errorConsole := gtk.text_view
 var errorScroll := gtk.scrolled_window
 var errorTag := errorConsole.buffer.create_tag("fixed", "foreground", "red")
 
-var outText := ""
-var errorText := ""
-
-var currentConsole := "output"      // Which console is being shown
-var out := false
 
 // Creates a new output console
 method createOut {
@@ -402,6 +402,33 @@ method clearConsoles {
     }
 }
 
+
+// Identical as the popIn method, but can be connected to the window's destroy button
+def popInBlock = {
+    consoleBox.reparent(splitPane)
+    popButton.label := "Pop Out"
+
+    if(currentConsole == "output") then {
+        outConsole.set_size_request(700, 200)
+        outScroll.set_size_request(700, 200)
+    }
+    if(currentConsole == "errors") then {
+     errorConsole.set_size_request(700, 200)
+     errorScroll.set_size_request(700, 200)
+    }
+
+    def cur_page_num = notebook.current_page
+    def cur_scrolled = scrolled_map.get(cur_page_num)
+    def cur_page = editor_map.get(cur_page_num)
+
+    cur_page.set_size_request(700, 400)
+    cur_scrolled.set_size_request(700, 400)
+
+    out := false
+    popped.visible := false
+}
+
+
 // This pops the console out into a separate window
 method popOut {
     popped := gtk.window(gtk.GTK_WINDOW_TOPLEVEL)
@@ -444,31 +471,6 @@ method popIn {
     if(currentConsole == "errors") then {
         errorConsole.set_size_request(700, 200)
         errorScroll.set_size_request(700, 200)
-    }
-
-    def cur_page_num = notebook.current_page
-    def cur_scrolled = scrolled_map.get(cur_page_num)
-    def cur_page = editor_map.get(cur_page_num)
-
-    cur_page.set_size_request(700, 400)
-    cur_scrolled.set_size_request(700, 400)
-
-    out := false
-    popped.visible := false
-}
-
-// Identical as the popIn method, but can be connected to the window's destroy button
-def popInBlock = {
-    consoleBox.reparent(splitPane)
-    popButton.label := "Pop Out"
-
-    if(currentConsole == "output") then {
-        outConsole.set_size_request(700, 200)
-        outScroll.set_size_request(700, 200)
-    }
-    if(currentConsole == "errors") then {
-     errorConsole.set_size_request(700, 200)
-     errorScroll.set_size_request(700, 200)
     }
 
     def cur_page_num = notebook.current_page

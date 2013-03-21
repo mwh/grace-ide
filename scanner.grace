@@ -2,6 +2,13 @@ import "io" as io
 import "mgcollections" as collections
 
 class Scanner.new(text : String) {
+// kjx moved up
+    var pointer := 1
+    var last_pointer := 1
+    var delimiter := " \n`"
+    var delimiter_list := collections.list.new(" ", "\n", "`")
+    var listChanged := false
+
 
 // Public Methods
 // -------------------
@@ -79,12 +86,6 @@ class Scanner.new(text : String) {
         pointer := num
     }
 // -------------------
-
-    var pointer := 1
-    var last_pointer := 1
-    var delimiter := " \n`"
-    var delimiter_list := collections.list.new(" ", "\n", "`")
-    var listChanged := false
 
     // Pulls the next character from the text and returns it. Increments 
     // the pointer

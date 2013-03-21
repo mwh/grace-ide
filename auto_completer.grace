@@ -1,4 +1,5 @@
 import "gtk" as gtk
+import "gdk" as gdk
 
 class Auto_Completer.new(window, notebook, editor_map) {
     // Initialise text iterators
@@ -10,17 +11,17 @@ class Auto_Completer.new(window, notebook, editor_map) {
     def accelgroup = gtk.accel_group
     
     // Connect the key presses
-    accelgroup.accel_connect(platform.gdk.GDK_KEY_Tab, { cursor_insert("    ") })
-    accelgroup.accel_connect(platform.gdk.GDK_KEY_Return, { do_enter() })
-    accelgroup.accel_connect(platform.gdk.GDK_KEY_braceleft, { 
+    accelgroup.accel_connect(gdk.GDK_KEY_Tab, { cursor_insert("    ") })
+    accelgroup.accel_connect(gdk.GDK_KEY_Return, { do_enter() })
+    accelgroup.accel_connect(gdk.GDK_KEY_braceleft, { 
         cursor_insert("\{\}")
         move_cursor_to(get_cursor - 1)
     })
-    accelgroup.accel_connect(platform.gdk.GDK_KEY_parenleft, { 
+    accelgroup.accel_connect(gdk.GDK_KEY_parenleft, { 
         cursor_insert("\(\)")
         move_cursor_to(get_cursor - 1)
     })
-    accelgroup.accel_connect(platform.gdk.GDK_KEY_quotedbl, { 
+    accelgroup.accel_connect(gdk.GDK_KEY_quotedbl, { 
         cursor_insert("\"\"")
         move_cursor_to(get_cursor - 1)
     })
