@@ -2,14 +2,6 @@ import "io" as io
 import "mgcollections" as collections
 
 class Scanner.new(text : String) {
-// kjx moved up
-    var pointer := 1
-    var last_pointer := 1
-    var delimiter := " \n`"
-    var delimiter_list := collections.list.new(" ", "\n", "`")
-    var listChanged := false
-
-
 // Public Methods
 // -------------------
 
@@ -24,19 +16,26 @@ class Scanner.new(text : String) {
 
     // Return the next line in the text
     method nextLine -> String is public {
-        delimiter_list := collections.list.new("\n", "`")
+        delimiter_list := collections.list.new("\n")
         listChanged := true
 
         return scan
     }
 
-    // Returns true if the pointer is not at the end of the text
+    // Returns true if there is another token left in the text that hasn't been
+    // read yet.
     method hasNext -> Boolean is public {
-        if(pointer > text.size) then {
-            return false
-        } else {
-            return true
+        var tPointer := pointer + 0
+
+        while{tPointer <= text.size} do {
+            if(checkDelimiter(text.at(tPointer))) then {
+                tPointer := tPointer + 1
+            } else {
+                return true
+            }
         }
+
+        return false
     }
     
     // Sets the delimiter for the scanner to use.
@@ -51,7 +50,7 @@ class Scanner.new(text : String) {
     // place in the text that the quotation mark was found.
     method find_next_quotation(start) -> Number is public {
         var loop := true
-        var end := start.asInteger32
+        var end := start + 0
         while {loop} do {
             end := end + 1
 
@@ -63,7 +62,7 @@ class Scanner.new(text : String) {
             }
         }
 
-        pointer := end.asInteger32 + 1
+        pointer := end + 1
         skipDelimiators
         return end
     }
@@ -87,13 +86,15 @@ class Scanner.new(text : String) {
     }
 // -------------------
 
+    var pointer := 1
+    var last_pointer := 1
+    var delimiter := " \n"  // Default delimiter
+    var delimiter_list := collections.list.new(" ", "\n")
+    var listChanged := false
+
     // Pulls the next character from the text and returns it. Increments 
     // the pointer
     method pull -> String {
-        if(pointer > text.size) then {
-            return "`"
-        }
-
         def ret = text.at(pointer)
         pointer := pointer + 1
         return ret
@@ -143,8 +144,6 @@ class Scanner.new(text : String) {
                 delPointer := delPointer + 1
             }
         }
-
-        delimiter_list.push("`")
     }
 
     // Returns the next token. Checks against the current delimiter.
@@ -155,17 +154,16 @@ class Scanner.new(text : String) {
         var ret := ""
         var loop := true
 
-        while {loop} do {
-            def char = pull() 
+        while {hasNext() && loop} do {
+            def char = pull()
 
             if(checkDelimiter(char)) then {
                 loop := false
-                skipDelimiators
-
             } else {
                 ret := ret ++ char
             }
         }
+        skipDelimiators()
 
         return ret
     }
@@ -186,6 +184,9 @@ class Scanner.new(text : String) {
 
             if(checkDelimiter(char)) then {
                 num := num + 1
+                if(num > text.size) then {
+                    loop := false
+                }
                 if(char.match("\n")) then {
                     loop := false
                 }
